@@ -1,0 +1,151 @@
+{
+  "app": "npx ts-node --prefer-ts-exts bin/serverless_template.ts",
+  "watch": {
+    "include": [
+      "**"
+    ],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "**/*.d.ts",
+      "**/*.js",
+      "tsconfig.json",
+      "package*.json",
+      "yarn.lock",
+      "node_modules",
+      "test"
+    ]
+  },
+  "context": {
+    "dev": {
+      "account": "663614489119",
+      "region": "eu-west-1",
+      "project": "arch-2",
+      "environment": "dev",
+      "stacks": {
+        "frontEnd": {
+          "s3": {
+            "versioned": false,
+            "publicReadAccess": false
+          },
+          "cloudfront": {
+            "defaultRootObject": "example.com/",
+            "certificate": {
+              "enableCertification": false,
+              "certificateArn": ""
+            },
+            "domainNames": [
+              "www.example.com"
+            ]
+          }
+        },
+        "cognito": {
+          "selfSignUpEnabled": true,
+          "signInAliases": {
+            "username": false,
+            "email": true
+          },
+          "email": {
+            "fromEmail": "noreply@myawesomeapp.com",
+            "fromName": "Awesome App",
+            "replyTo": "support@myawesomeapp.com"
+          },
+          "standarsAttribute": {
+            "emailRequired": true,
+            "emailMutable": false
+          },
+          "passwordPolicy": {
+            "minLength": 12,
+            "requireLowercase": true,
+            "requireUppercase": true,
+            "requireDigits": true,
+            "requireSymbols": true,
+            "daysPasswordValidity": 180
+          },
+          "addClients": false,
+          "clients": [
+            {
+              "clientName": "app-client-name",
+              "authorizationCodeGrant": true,
+              "callbackUrls": [
+                "https://my-app-domain.com/welcome"
+              ],
+              "logoutUrls": [
+                "https://my-app-domain.com/signin"
+              ],
+              "authFlows": {
+                "userPassword": true,
+                "userSrp": true
+              },
+              "generateSecret": false
+            }
+          ]
+        },
+        "lambda": [
+          {
+            "id": "FirstLambda",
+            "runtime": "nodejs16.x",
+            "handler": "functionLambda.firstHandler",
+            "codePath": "/lambdaFn",
+            "grantReadToDynamo": true,
+            "grantWriteToDynamo": true
+          },
+          {
+            "id": "SecondLambda",
+            "runtime": "python3.9",
+            "handler": "functionLambda.Secondhandler",
+            "codePath": "/lambdaFn"
+          }
+        ],
+        "apigateway": [
+          {
+            "resources": [
+              {
+                "resourceName": "items",
+                "methods": ["GET"],
+                "child": [
+                  {
+                    "resourceName": "{item}",
+                    "methods": ["GET", "POST"],
+                    "child": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "resources": [
+              {
+                "resourceName": "prods",
+                "methods": ["POST"],
+                "child": []
+              }
+            ]
+          }
+        ]
+        
+      }
+    },
+    "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
+    "@aws-cdk/core:stackRelativeExports": true,
+    "@aws-cdk/aws-rds:lowercaseDbIdentifier": true,
+    "@aws-cdk/aws-lambda:recognizeVersionProps": true,
+    "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
+    "@aws-cdk/aws-cloudfront:defaultSecurityPolicyTLSv1.2_2021": true,
+    "@aws-cdk-containers/ecs-service-extensions:enableDefaultLogDriver": true,
+    "@aws-cdk/aws-ec2:uniqueImdsv2TemplateName": true,
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/aws-iam:minimizePolicies": true,
+    "@aws-cdk/aws-ecs:arnFormatIncludesClusterName": true,
+    "@aws-cdk/core:validateSnapshotRemovalPolicy": true,
+    "@aws-cdk/aws-codepipeline:crossAccountKeyAliasStackSafeResourceName": true,
+    "@aws-cdk/aws-s3:createDefaultLoggingPolicy": true,
+    "@aws-cdk/aws-sns-subscriptions:restrictSqsDescryption": true,
+    "@aws-cdk/aws-apigateway:disableCloudWatchRole": true,
+    "@aws-cdk/core:enablePartitionLiterals": true,
+    "@aws-cdk/core:target-partitions": [
+      "aws",
+      "aws-cn"
+    ]
+  }
+}
